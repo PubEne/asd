@@ -54,5 +54,7 @@ int main()
         temp = temp->m_next;
     }
     std::cout << "length: " << head->getLength(head) << std::endl;
-    std::cout << "nth: " << head->nth(4,head) << std::endl;
+    std::cout << "nth_tail: " << head->nth(4,head) << std::endl;
+    std::cout << "nth_head: " << head->nth(0,head) << std::endl;
+    std::cout << "nth31: " << head->nth(31,head) << std::endl;
 }
