@@ -1,7 +1,8 @@
 #include <iostream>
 #include <cmath>
 
-constexpr int inline binomialCoeff(const int & n,const int &k)
+//wrong
+constexpr int binomialCoeff(const int & n,const int &k)
 {
     return (k==0 || k==n) ? 1 : binomialCoeff(n-1,k-1)+binomialCoeff(n-1,k);
 }
