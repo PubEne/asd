@@ -11,7 +11,7 @@ struct lnode
     {
         return std::make_shared<lnode>(nullptr,x);
     }
-    int getLength(const std::shared_ptr<lnode>& head)
+    int getLength(const std::shared_ptr<lnode>& head) const
     {
         int length{};
         auto temp = head;
@@ -19,7 +19,7 @@ struct lnode
             temp = temp->m_next;
         return length;
     }
-    void append(std::shared_ptr<lnode> & head, const int & num)
+    void append(std::shared_ptr<lnode> & head, const int & num) const
     {
         auto new_nlode = createNode(num);
         auto temp = head;
@@ -30,18 +30,18 @@ struct lnode
                 temp = temp->m_next;
         temp->m_next = new_nlode;
     }
+    int nth(const size_t & n,const std::shared_ptr<lnode>& head) const
+    {
+        int counter{};
+        if(head && n >= head->getLength(head))
+            return 0;
+        auto temp = head;
+        while(temp && n != counter++)
+            temp = temp->m_next;
+        return temp->m_key;
+    }
     ~lnode() {}
 };
-int nth(const size_t & n,const std::shared_ptr<lnode>& head)
-{
-    int counter{};
-    if(head && n >= head->getLength(head))
-        return 0;
-    auto temp = head;
-    while(temp && n != counter++)
-        temp = temp->m_next;
-    return temp->m_key;
-}
 int main()
 {
     auto head = lnode::createNode(5);
@@ -54,5 +54,5 @@ int main()
         temp = temp->m_next;
     }
     std::cout << "length: " << head->getLength(head) << std::endl;
-    std::cout << "nth: " << nth(4,head) << std::endl;
+    std::cout << "nth: " << head->nth(4,head) << std::endl;
 }
