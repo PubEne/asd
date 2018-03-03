@@ -7,6 +7,13 @@ namespace ASD
     {
         public:
             explicit Fraction(T numerator=0,T denominator=1) : m_numerator(numerator), m_denominator(denominator) {}
+            bool canSimplify() const
+            {
+                for(int i = m_numerator; i >= 2; --i)
+                    if((!(m_numerator % i) && !(m_denominator % i)))
+                        return true;
+                return false;
+            }
             Fraction operator*(const Fraction& fraction) const
             {
                 return Fraction(m_numerator*fraction.m_numerator,m_denominator*fraction.m_denominator);
@@ -33,6 +40,8 @@ namespace ASD
             }
             friend std::ostream &operator<<(std::ostream &out, const Fraction & fraction) 
             {
+                if(fraction.canSimplify())
+                    return out << "fraction can be simplified";
                 if(fraction.m_numerator == fraction.m_denominator)
                     return out << 1;
                 if(fraction.m_denominator == 1)
@@ -53,9 +62,10 @@ namespace ASD
 int main()
 {
     try {
-            ASD::Fraction<double> fraction{5,4};
-            //std::cin >> fraction;
-            std::cout << fraction*ASD::Fraction<double>(3,5) << std::endl;
+            ASD::Fraction<int> fraction;
+            std::cout << fraction << std::endl;
+            std::cin >> fraction;
+            std::cout << fraction*ASD::Fraction<int>(3,5) << std::endl;
         }
     catch(const std::overflow_error &e) 
         {
