@@ -42,8 +42,6 @@ namespace ASD
             {
                 if(fraction.canSimplify())
                     return out << "fraction can be simplified";
-                if(fraction.m_numerator == fraction.m_denominator)
-                    return out << 1;
                 if(fraction.m_denominator == 1)
                     return out << fraction.m_numerator;
                 if(fraction.m_numerator && fraction.m_denominator)
@@ -63,9 +61,8 @@ int main()
 {
     try {
             ASD::Fraction<int> fraction;
-            std::cout << fraction << std::endl;
             std::cin >> fraction;
-            std::cout << fraction*ASD::Fraction<int>(3,5) << std::endl;
+            std::cout << fraction << std::endl;
         }
     catch(const std::overflow_error &e) 
         {
