@@ -19,9 +19,11 @@ std::map<char,int> countOccurrences(const std::string & filename)
     file.close();
     return occurrences;
 }
-int main()
+int main(int argc, char*argv[])
 {
-    std::map<char,int> occurrences = countOccurrences("letter2.txt");
+    if(!argv[1])
+        return 0;
+    std::map<char,int> occurrences = countOccurrences(argv[1]);
     for (const auto& entry : occurrences)
         std::cout << entry.first << '=' << entry.second << std::endl;
 }
