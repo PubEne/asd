@@ -1,9 +1,10 @@
 #include <iostream>
 #include <typeinfo>
 #include <cmath>
+// doesn't work for double precision values
 namespace ASD
 {
-    template<typename T0, typename T1>
+    template<typename T0=int, typename T1=int>
     auto inline Rpow(T0 const& x, T1 const& n) -> decltype(x*n)
     {
         using value_type = decltype(x*n);
@@ -23,7 +24,6 @@ namespace ASD
             if(n & 1)
                 res *= x;
             n >>= 1;
-            std::cout << n << std::endl;
             x *= x;
         }
         return res;
@@ -31,6 +31,6 @@ namespace ASD
 }
 int main()
 {
-//    std::cout << ASD::Rpow(2.3,-3) << std::endl;
+    std::cout << ASD::Rpow(2.3,-3) << std::endl;
     std::cout << ASD::pow(2,4) << std::endl;
 }

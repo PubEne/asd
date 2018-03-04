@@ -1,18 +1,20 @@
 #include <iostream>
 #include <cmath>
 
-constexpr int inline binomialCoeff(const int & n,const int &k)
-{
-    return (k==0 || k==n) ? 1 : binomialCoeff(n-1,k-1)+binomialCoeff(n-1,k);
-}
 double Bernoulli_trial(const int &k,const int &n,const double &p)
 {
-    double probability{};
-    for(int i = 0; i < k; i++)
-        probability += binomialCoeff(n,k)*pow(p,i)*pow(1-p,n-i);
-    return probability;
+    const double q = 1-p;
+    const double p_q = p/q;
+    double probability = pow(q,n);
+    double sum = probability;
+    for(size_t i = 1; i < k; ++i)
+    {
+        probability *= ((n+1-i)*p_q)/i;
+        sum += probability;
+    }
+    return sum;
 }
 int main()
 {
-    std::cout << Bernoulli_trial(5,10,1) << std::endl;
+    std::cout << Bernoulli_trial(8,14,0.6) << std::endl;
 }
