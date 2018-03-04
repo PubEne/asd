@@ -12,13 +12,12 @@ std::map<char,int> countOccurrences(const std::string & filename)
     file.open(filename);
     while(file.is_open() && !file.eof())
     {
-        getline(file,line);
-        for(const char & character: line)
+        std::getline(file,line);
+        for(const char & character : line)
             occurrences[character] += 1;
     } 
     file.close();
     return occurrences;
-
 }
 int main()
 {
