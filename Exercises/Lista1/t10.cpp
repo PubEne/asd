@@ -44,7 +44,7 @@ namespace ASD
             void push(const T& val)
             {
                 auto new_nlode = lnode::createNode(val);
-                if(!m_front && !m_back)
+                if(!m_front)
                     m_front = m_back = new_nlode;
                 else
                     m_back = m_back->m_next = new_nlode;
@@ -55,21 +55,37 @@ namespace ASD
                 if(!m_front)
                     return;
                 if(m_front == m_back)
+                {
+                    delete m_front;
                     m_front = m_back = nullptr;
+                }
                 else
-                    m_front = m_front->m_next;
+                {
+                    lnode *temp = m_front->m_next;
+                    delete(m_front);
+                    m_front = temp;
+                }
                 --m_size; 
+            }
+            ~queue()
+            {
+                while(m_front)
+                {
+                    lnode * temp = m_front->m_next;
+                    delete(m_front);
+                    m_front = temp;
+                }
             }
         private:
             struct lnode
             {
-                explicit lnode(const std::shared_ptr<lnode>& ln = nullptr,const T& k = 0) : m_next{ln}, m_key{k} {}
+                explicit lnode(lnode*const ln = nullptr,const T& k = 0) : m_next{ln}, m_key{k} {}
                 T m_key;
-                std::shared_ptr<lnode> m_next;
-                static std::shared_ptr<lnode> createNode(const T &x=0) { return std::make_shared<lnode>(nullptr,x); }
+                lnode* m_next;
+                static lnode * createNode(const T &x=0) { return new lnode(nullptr,x); }
             };    
-            std::shared_ptr<lnode> m_front;
-            std::shared_ptr<lnode> m_back;
+            lnode* m_front;
+            lnode* m_back;
             size_t m_size;
     };
 } 

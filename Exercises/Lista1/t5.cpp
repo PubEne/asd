@@ -3,15 +3,12 @@
 
 struct lnode
 {
-    explicit lnode(const std::shared_ptr<lnode>& ln = nullptr,const int& k = 0) : m_next{ln}, m_key{k} {}
+    explicit lnode(lnode*const ln = nullptr,const int& k = 0) : m_next{ln}, m_key{k} {}
     int m_key;
-    std::shared_ptr<lnode> m_next;
+    lnode * m_next;
 
-    static std::shared_ptr<lnode> createNode(const int & x)
-    {
-        return std::make_shared<lnode>(nullptr,x);
-    }
-    int getLength(const std::shared_ptr<lnode>& head) const
+    static lnode* createNode(const int &k) { return new lnode(nullptr,k); }
+    int getLength(const lnode*const head) const
     {
         int length{};
         auto temp = head;
@@ -19,7 +16,7 @@ struct lnode
             temp = temp->m_next;
         return length;
     }
-    void append(std::shared_ptr<lnode> & head, const int & num) const
+    void append(lnode*& head, const int & num) const
     {
         auto new_nlode = createNode(num);
         auto temp = head;
@@ -30,7 +27,7 @@ struct lnode
                 temp = temp->m_next;
         temp->m_next = new_nlode;
     }
-    int nth(const size_t & n,const std::shared_ptr<lnode>& head) const
+    int nth(const size_t & n,const lnode* head) const
     {
         int counter{};
         if(head && n >= head->getLength(head))
@@ -40,21 +37,33 @@ struct lnode
             temp = temp->m_next;
         return temp->m_key;
     }
-    ~lnode() {}
+    ~lnode() { }
 };
+void deleteList(lnode *& head)
+{
+    lnode *next;
+    while(head)
+    {
+        next = head->m_next;
+        delete head;
+        head = next;
+    }
+}
 int main()
 {
-    auto head = lnode::createNode(5);
+    auto head = lnode::createNode(333);
     for(size_t i = 0; i < 4; ++i)
         head->append(head,1+i*i);
     auto temp = head;
     while(temp)
     {
-        std::cout << temp->m_key << std::endl;
+        std::cout << temp->m_key << " ";
         temp = temp->m_next;
     }
-    std::cout << "length: " << head->getLength(head) << std::endl;
+    std::cout << std::endl << "length: " << head->getLength(head) << std::endl;
     std::cout << "nth_tail: " << head->nth(4,head) << std::endl;
     std::cout << "nth_head: " << head->nth(0,head) << std::endl;
-    std::cout << "nth31: " << head->nth(31,head) << std::endl;
+    std::cout << "nth6: " << head->nth(5,head) << std::endl;
+    std::cout << "nth_4: " << head->nth(3,head) << std::endl;
+    deleteList(head); //I know - it would be better to do it in destructor
 }

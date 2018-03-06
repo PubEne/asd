@@ -11,7 +11,7 @@ namespace ASD
 
         for(size_t i = 2; pow(i,2) < n; ++i)
             if(primes[i])
-                for(size_t j = i*2; j < n; j +=i)
+                for(size_t j = i*i; j < n; j +=i)
                     primes[j] = false;
         for(size_t i = 0; i < n; ++i)
             if(primes[i]) 
