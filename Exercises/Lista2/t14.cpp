@@ -95,22 +95,37 @@ void g(node* root)
 }
 void inorder_do(node* root,void f(node*))
 {
-    std::stack<node*> s;
-    while(!s.empty() || root)
+    node *prev = nullptr;
+    while(root)
     {
-        if(root)
+        if(prev == root->parent)
         {
-            s.emplace(root);
-            root = root->left;
+            if(root->left)
+            {
+                prev = root;
+                root = root->left;
+                continue;
+            }
+            else
+                prev = nullptr;
         }
-        else
+        if(prev == root->left)
         {
-            root = s.top();
-            s.pop();
             f(root);
-            std::cout << root->key << " ";
-            root = root->right;
-        } 
+            if(root->right)
+            {
+                prev = root;
+                root = root->right;
+                continue;
+            }
+            else
+                prev = nullptr;
+        }
+        if(prev == root->right)
+        {
+            prev = root;
+            root = root->parent;
+        }
     }
 }
 void destroy(node*& root)
@@ -139,7 +154,6 @@ int main()
     inorder(root);
     std::cout << std::endl; 
     inorder_do(root,g);
-    std::cout << std::endl; 
     inorder(root);
     std::cout << std::endl;
     destroy(root);
