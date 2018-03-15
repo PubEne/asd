@@ -30,19 +30,29 @@ void remove(node*& root,const int& key)
     {
         if(nd->right && nd->left) //two children
         {
-            node* subtree = nd->right; 
-            node** child = &subtree; 
+            node** child = &(nd->right); 
             node* parent = nullptr;
+
             while((*child)->left)
             {
                 parent = *child;
                 child = &(*child)->left;
             }
-            nd->key = (*child)->key;
-            nd->right = subtree;
-
-            delete *child;
-            *child = nullptr;
+            nd->key = (*child)->key; //take most left child value
+            if((*child)->right) //has right kids ?
+            {
+                //take kids and connect them to their grandparents
+                node* right_child = (*child)->right;                 
+                delete *child;
+                *child = nullptr;
+                parent->left = right_child;
+            }
+            else
+            {
+                delete *child;
+                *child = nullptr;
+            }
+            
         }
         else if(!nd->right && !nd->left) //leaf 
         {
@@ -87,23 +97,19 @@ int main()
     node* root = nullptr;
     insert(root,5);
     insert(root,2);
-    insert(root,3);
-    insert(root,9);
-    insert(root,6);
-    insert(root,7);
-/*    insert(root,2);
     insert(root,10);
     insert(root,7);
     insert(root,6); 
     insert(root,15); 
     insert(root,14); 
     insert(root,13); 
-    insert(root,16); */
+    insert(root,16);  
 
     inorder(root);
 
     std::cout << std::endl;
-    remove(root,5);
+    remove(root,15);
+    remove(root,10);
     inorder(root);
     std::cout << std::endl;
     destroy(root);
