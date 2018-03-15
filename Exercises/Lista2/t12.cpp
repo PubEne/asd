@@ -35,13 +35,25 @@ void remove(node *&root,const int& key)
     {
         if(nd->right && nd->left) //two children
         {
-            auto min = nd->right;
-            while(min->left)
-                min = min->left;
-            nd->key = min->key; 
-            delete min;
-            min = nullptr;
-            nd->right = nd->parent;  
+            node** child = &(nd->right); //right subtree
+
+            while((*child)->left)
+                child = &(*child)->left;
+
+            nd->key = (*child)->key; //take most left child value
+            if((*child)->right) //has right kids ?
+            {
+                node* right_child = (*child)->right;
+                node* parent = (*child)->parent;
+                delete *child;
+                *child = nullptr;
+                parent->left = right_child;
+            }
+            else
+            {
+                delete *child;
+                *child = nullptr;
+            }
         }
         else if(!nd->right && !nd->left) //leaf 
         {
@@ -75,19 +87,36 @@ void inorder(const node *const t)
         inorder(t->right);
     }
 }
+void destroy(node*& root)
+{
+    if(root)
+    {
+        destroy(root->right);
+        destroy(root->left);
+        delete root;
+        root = nullptr;
+    }
+}
 int main()
 {
     node* root = nullptr;
-
     insert(root,5);
-    insert(root,22);
-    insert(root,25);
-    insert(root,17);
-    insert(root,16);
-    insert(root,19);
+    insert(root,2);
+    insert(root,10);
+    insert(root,7);
+    insert(root,6); 
+    insert(root,15); 
+    insert(root,14); 
+    insert(root,13); 
+    insert(root,16);  
+
     inorder(root);
-    remove(root,7);
+
     std::cout << std::endl;
+    remove(root,15);
+    remove(root,10);
     inorder(root);
+    std::cout << std::endl;
+    destroy(root);
     //std::cout << root->left->key << "," << root->left->parent->key << std::endl;
 }
