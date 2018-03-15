@@ -52,7 +52,6 @@ void remove(node*& root,const int& key)
                 delete *child;
                 *child = nullptr;
             }
-            
         }
         else if(!nd->right && !nd->left) //leaf 
         {
