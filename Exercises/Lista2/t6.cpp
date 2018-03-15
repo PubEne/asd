@@ -87,13 +87,14 @@ lnode * merge(lnode* L1, lnode* L2)
     L1->m_next = L2;
     return head;
 }
-lnode * merge2(lnode* L1, lnode* L2)
+void deleteList(lnode *& head)
 {
-    //lnode* head = nullptr,*tail = nullptr;
-    while(L1->m_next || L2->m_next)
+    if(head)
     {
+        deleteList(head->m_next);
+        delete head;
+        head = nullptr;
     }
-    return nd;
 }
 int main()
 {
@@ -106,12 +107,12 @@ int main()
     }
     printList(head);
     printList(head2);
-    auto head3 = merge2(head,head2);
+    auto head3 = merge(head,head2);
     printList(head3);
 /*    std::cout << "length: " << head->getLength(head) << std::endl;
     std::cout << "nth_tail: " << head->nth(4,head) << std::endl;
     std::cout << "nth_head: " << head->nth(0,head) << std::endl;
     std::cout << "nth6: " << head->nth(5,head) << std::endl;
     std::cout << "nth_3: " << head->nth(3,head) << std::endl;  */
-    //deleteList(head); //I know - it would be better to do it in destructor
+    deleteList(head); //I know - it would be better to do it in destructor
 }
