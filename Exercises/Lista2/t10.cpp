@@ -39,13 +39,7 @@ void remove(node*& root,const int& key)
                 child = &(*child)->left;
             }
             nd->key = (*child)->key;
-            if(!subtree->right && !subtree->left) //subtree doesn't have kids?
-                nd->right = nullptr;
-            else
-                nd->right = subtree; 
-            // check if last most left element had right kids, if yes then we should connect to its parent
-            if((*child)->right)
-                (*child)->right = parent;
+            nd->right = subtree;
 
             delete *child;
             *child = nullptr;
