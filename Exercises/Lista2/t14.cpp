@@ -1,18 +1,25 @@
 #include <iostream>
+#include <stack>
+#include <vector>
 
 struct node
 {
-    explicit node(const int& k) : key{k},left{nullptr},right{nullptr} {}
+    explicit node(const int& k,node*const n=nullptr) : key{k},left{nullptr},right{nullptr},parent{n} {}
     int key;
     node* left;
     node* right;
+    node* parent;
 };
-void insert(node*& root,const int& key)
+
+void insert(node *& root,const int& key)
 {
-    node** current = &root;
+    node** current = &root,*prev = nullptr;
     while(*current)
+    {
+        prev = *current;
         current = key > (*current)->key ? &(*current)->right : &(*current)->left;
-    *current = new node(key);   
+    }
+    *current = new node(key,prev); 
 }
 node* find(node* nd,const int& key)
 {
@@ -20,29 +27,26 @@ node* find(node* nd,const int& key)
         nd = key > nd->key ? nd->right : nd->left;
     return nd;
 }
-void remove(node*& root,const int& key)
+void remove(node *&root,const int& key)
 {
     node** nde = &root;
     while((*nde) && (*nde)->key!=key)
         nde = key > (*nde)->key ? &(*nde)->right : &(*nde)->left;
     auto& nd = *nde;
-    if(nd) 
+    if(nd)
     {
         if(nd->right && nd->left) //two children
         {
-            node** child = &(nd->right); 
-            node* parent = nullptr;
+            node** child = &(nd->right); //right subtree
 
             while((*child)->left)
-            {
-                parent = *child;
                 child = &(*child)->left;
-            }
+
             nd->key = (*child)->key; //take most left child value
             if((*child)->right) //has right kids ?
             {
-                //take kids and connect them to their grandparents
-                node* right_child = (*child)->right;                 
+                node* right_child = (*child)->right;
+                node* parent = (*child)->parent;
                 delete *child;
                 *child = nullptr;
                 parent->left = right_child;
@@ -61,18 +65,22 @@ void remove(node*& root,const int& key)
         else if(!nd->left) // has right child
         {   
             node* temp = nd->right;
+            node* parent = nd->parent;
             delete nd;
             nd = temp;
+            nd->parent = parent;
         }
-        else //left
+        else
         {
             node* temp = nd->left;
+            node* parent = nd->parent;
             delete nd;
             nd = temp;
+            nd->parent = parent;
         }
     }  
 }
-void inorder(const node *const root)
+void inorder(const node*const root)
 {
     if(root)
     {
@@ -81,25 +89,36 @@ void inorder(const node *const root)
         inorder(root->right);
     }
 }
-void inorder_do(node*const root,void f(node*const))
+void g(node* root)
 {
-    if(root)
-    {
-        inorder_do(root->left,f);
-        f(root);
-        inorder_do(root->right,f);
-    }
+    root->key += 5;
 }
-void g(node*const root)
+void inorder_do(node* root,void f(node*))
 {
-    std::cout << ++++++++root->key << " ";
+    std::stack<node*> s;
+    while(!s.empty() || root)
+    {
+        if(root)
+        {
+            s.emplace(root);
+            root = root->left;
+        }
+        else
+        {
+            root = s.top();
+            s.pop();
+            f(root);
+            std::cout << root->key << " ";
+            root = root->right;
+        } 
+    }
 }
 void destroy(node*& root)
 {
     if(root)
     {
-        destroy(root->left);
         destroy(root->right);
+        destroy(root->left);
         delete root;
         root = nullptr;
     }
@@ -115,11 +134,14 @@ int main()
     insert(root,15); 
     insert(root,14); 
     insert(root,13); 
-    insert(root,16);  
+    insert(root,16);   
 
+    inorder(root);
+    std::cout << std::endl; 
     inorder_do(root,g);
+    std::cout << std::endl; 
+    inorder(root);
     std::cout << std::endl;
-    remove(root,15);
-    remove(root,10);
     destroy(root);
+    //std::cout << root->left->key << "," << root->left->parent->key << std::endl;
 }
