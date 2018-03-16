@@ -140,13 +140,30 @@ void destroy(node*& root)
 }
 constexpr size_t height(const node*const root) //recursive
 {
-    return root ? 1 + std::max(height(root->left),height(root->right)) : 0;
+    return root ? 1+std::max(height(root->left),height(root->right)) : 0;
 }
-size_t height_it(const node* root) //iterative
+size_t height_it(node* root) //iterative
 {
     size_t height{};
     if(!root)
         return height;
+    std::stack<node*> s;
+    s.emplace(root);
+    for(;;)
+    {
+        size_t counter = s.size();
+        if(!counter) return ++height;
+        ++height;
+        while(counter--)
+        {
+            node* n = s.top();
+            s.pop();
+            if(n->left)
+                s.emplace(n->left);
+            if(n->right)
+                s.emplace(n->right);
+        }
+    }
 }
 int main()
 {
