@@ -20,6 +20,8 @@ namespace ASD
             iterator& operator=(const iterator& it) { current = it.current; return *this; }
             iterator& operator++()
             {
+                if(!current)
+                    throw std::runtime_error("sdsd");
                 if(current->right) //Can go right? go and then go maximally left 
                 {
                     current = current->right;
@@ -59,8 +61,9 @@ namespace ASD
 }
 ASD::iterator begin(node* root) //starting from most left
 {
-    while(root->left)
-        root = root->left;
+    if(root)
+        while(root->left)
+            root = root->left;
     return ASD::iterator(root);
 }
 ASD::iterator end(node* root)
@@ -232,11 +235,10 @@ int main()
     insert(root,15); 
     insert(root,14); 
     insert(root,13); 
-    insert(root,16);   
+    insert(root,16);    
 
     inorder(root); //inorder recursively
     std::cout << std::endl;
-
     for(ASD::iterator i = begin(root); i != end(root);++i) //iterator
     {
         std::cout << *i << " ";
