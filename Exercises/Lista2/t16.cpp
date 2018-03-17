@@ -20,8 +20,6 @@ namespace ASD
             iterator& operator=(const iterator& it) { current = it.current; return *this; }
             iterator& operator++()
             {
-                if(!current)
-                    throw std::runtime_error("sdsd");
                 if(current->right) //Can go right? go and then go maximally left 
                 {
                     current = current->right;
