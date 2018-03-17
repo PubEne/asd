@@ -59,9 +59,8 @@ namespace ASD
 }
 ASD::iterator begin(node* root) //starting from most left
 {
-    if(root)
-        while(root->left)
-            root = root->left;
+    while(root && root->left)
+        root = root->left;
     return ASD::iterator(root);
 }
 ASD::iterator end(node* root)
