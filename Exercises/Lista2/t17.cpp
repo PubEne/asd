@@ -101,8 +101,9 @@ void remove(node*& root,const int& key)
     {
         if(nd->right && nd->left) //two children
         {
-            node** child = &(nd->right); 
-            node* parent = nullptr;
+            node** child = &(nd); 
+            node* parent = *child;
+            child = &(nd->right);
             bool hasLeftChild = false;
 
             while((*child)->left)
