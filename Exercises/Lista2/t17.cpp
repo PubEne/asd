@@ -103,11 +103,13 @@ void remove(node*& root,const int& key)
         {
             node** child = &(nd->right); 
             node* parent = nullptr;
+            bool hasLeftChild = false;
 
             while((*child)->left)
             {
                 parent = *child;
                 child = &(*child)->left;
+                hasLeftChild = true;
             }
             nd->key = (*child)->key; //take most left child value
             if((*child)->right) //has right kids ?
@@ -116,7 +118,7 @@ void remove(node*& root,const int& key)
                 node* right_child = (*child)->right;                 
                 delete *child;
                 *child = nullptr;
-                parent->left = right_child;
+                hasLeftChild ? parent->left = right_child : parent->right = right_child;
             }
             else
             {
