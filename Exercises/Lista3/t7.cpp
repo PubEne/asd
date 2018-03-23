@@ -184,7 +184,7 @@ constexpr size_t lvl(const node* cur,const int& key)
     size_t lvl = 1;
     while(cur && cur->key != key && ++lvl)
         cur = key > cur->key ? cur->right : cur->left; 
-    return cur && cur->key == key ? lvl : 0;
+    return cur ? lvl : 0;
 }
 int main()
 {
@@ -206,6 +206,6 @@ int main()
     {
         std::cout << *i << " ";
     }
-    std::cout << std::endl << lvl(root,15) << std::endl;
+    std::cout << std::endl << lvl(root,-5) << std::endl;
     destroy(root);
 }
