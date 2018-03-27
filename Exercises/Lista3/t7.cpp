@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stack>
+#include <queue>
 
 struct node
 {
@@ -21,7 +22,7 @@ namespace ASD
                 s = it.s;
                 return *this; 
             }
-            iterator& operator++()
+            iterator& operator++() //not efficient, there's a way to implement it better(too many elements on the stack)
             {
                 if(current->right)
                 {
@@ -178,26 +179,33 @@ void destroy(node*& root)
         root = nullptr;
     }
 }
+constexpr size_t lvl(const node* cur,const int& key)
+{
+    size_t lvl = 1;
+    while(cur && cur->key != key && ++lvl)
+        cur = key > cur->key ? cur->right : cur->left; 
+    return cur ? lvl : 0;
+}
 int main()
 {
     node* root = nullptr;
     insert(root,5);
     insert(root,2);
     insert(root,1);
-    insert(root,3);
+    insert(root,15);
+/*    insert(root,3);
     insert(root,10);
     insert(root,7);
     insert(root,6); 
     insert(root,15); 
     insert(root,14); 
     insert(root,13); 
-    insert(root,16);   
+    insert(root,16); */  
 
-    inorder(root);
-    std::cout << std::endl;
-    for(ASD::iterator i = begin(root); i != end(root);++i) //iterator
+    for(ASD::iterator i=begin(root); i!=end(root); ++i) //iterator
     {
         std::cout << *i << " ";
     }
+    std::cout << std::endl << lvl(root,-5) << std::endl;
     destroy(root);
 }

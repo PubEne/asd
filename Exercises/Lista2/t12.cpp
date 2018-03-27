@@ -36,10 +36,13 @@ void remove(node *&root,const int& key)
         if(nd->right && nd->left) //two children
         {
             node** child = &(nd->right); //right subtree
+            bool hasLeftChild = false;
 
             while((*child)->left)
+            {
                 child = &(*child)->left;
-
+                hasLeftChild = true;
+            }
             nd->key = (*child)->key; //take most left child value
             if((*child)->right) //has right kids ?
             {
@@ -47,7 +50,7 @@ void remove(node *&root,const int& key)
                 node* parent = (*child)->parent;
                 delete *child;
                 *child = nullptr;
-                parent->left = right_child;
+                hasLeftChild ? parent->left = right_child : parent->right = right_child;
             }
             else
             {
@@ -100,7 +103,7 @@ void destroy(node*& root)
 int main()
 {
     node* root = nullptr;
-    insert(root,5);
+/*    insert(root,5);
     insert(root,2);
     insert(root,10);
     insert(root,7);
@@ -108,13 +111,21 @@ int main()
     insert(root,15); 
     insert(root,14); 
     insert(root,13); 
-    insert(root,16);  
+    insert(root,16); */ 
+    insert(root,3); 
+    insert(root,4); 
+    insert(root,1); 
+    insert(root,7); 
+    insert(root,-4); 
+    insert(root,9); 
+    insert(root,2); 
 
     inorder(root);
 
     std::cout << std::endl;
-    remove(root,15);
-    remove(root,10);
+   // remove(root,15);
+   // remove(root,10);
+    remove(root,3);
     inorder(root);
     std::cout << std::endl;
     destroy(root);
