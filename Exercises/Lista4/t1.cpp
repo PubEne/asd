@@ -10,18 +10,16 @@ constexpr void printArray(const T*const arr,const size_t& n = 0)
 void counting_sort(size_t*const& t,const size_t& n,size_t c)
 {
     size_t exp = 1;
-    size_t occurrences[n];
+    size_t occurrences[n] = {0};
     size_t temp[n];
 
     while(c--)
         exp *= 10;
-    for(size_t i = 0; i < n; ++i)
-        occurrences[i] = 0;
     for(size_t i = 0; i < n; ++i) 
         ++occurrences[(t[i]/exp)%10];
-    for(size_t i = 1; i < n; ++i) 
+    for(size_t i = 1; i < 10; ++i) 
         occurrences[i] += occurrences[i-1];
-    for(size_t i = 0; i < n; ++i) 
+    for(int i = n-1; i >= 0; --i) 
         temp[--occurrences[(t[i]/exp)%10]] = t[i];
     for(size_t i = 0; i < n; ++i)
         t[i] = temp[i];
