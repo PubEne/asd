@@ -10,7 +10,7 @@ constexpr void printArray(const T*const arr,const size_t& n = 0)
 void counting_sort(size_t*const& t,const size_t& n,size_t c)
 {
     size_t exp = 1;
-    size_t occurrences[n] = {0};
+    size_t occurrences[10] = {0};
     size_t temp[n];
 
     while(c--)
