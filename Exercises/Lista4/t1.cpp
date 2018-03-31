@@ -29,7 +29,7 @@ void counting_sort(size_t*const& t,const size_t& n,size_t c)
 
 int main()
 {
-    size_t t[] = {9,8,7,6,5,4,3,7,6,5};
+    size_t t[] = {91,82,73,64,55,46,37,78,69,50};
     const size_t n = sizeof(t)/sizeof(*t);
     printArray(t,n);
     counting_sort(t,n,0);
