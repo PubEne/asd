@@ -8,6 +8,7 @@ unsigned long long catalan(const size_t& n)
     for(size_t i = 0; i < n; ++i)
         sum += catalan(i)*catalan(n-i-1);
     return sum;    
+    //Time complexity O(2^n)
 }
 unsigned long long catalan2(const size_t& n)
 {
@@ -20,6 +21,7 @@ unsigned long long catalan2(const size_t& n)
             arr[i] += arr[j]*arr[i-j-1];
     }
     return arr[n];
+    //Time complexity O(n^2)
 }
 
 int main()
