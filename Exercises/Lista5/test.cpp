@@ -164,10 +164,12 @@ template<typename T>
 void heap_sort(T t[],size_t n)
 {
     for(int i = n/2; i >= 0; --i)
-        siftDown(t,n,i);
-    while(--n)
+        siftDown(t,n,i); //start with the most right parent
+    while(--n) 
     {
-        std::swap(t[0],t[n]);
+        /* swap the largest with the smallest value, and siftDown the smallest, decrease by 1 size, so we don't change our largest value
+        */
+        std::swap(t[0],t[n]); 
         siftDown(t,n,0);
     }
 }
