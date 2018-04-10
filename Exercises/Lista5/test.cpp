@@ -144,6 +144,10 @@ void siftDown(T t[],const size_t& n,size_t parent)
     for(;;)
     {
         size_t k = 2*parent + 2; //right child
+        /*check if right child exists and is greater than parent and brother
+          OR if left child exists and is greater than parent
+          SEE! We don't have to check if left child is greater than right child - since we know, that we're already in the second condition, it would mean, right child doesn't exist or is smaller than left
+        */
         if((k < n && t[k] > parent_key && t[k] > t[k-1]) || (--k < n && t[k] > parent_key))
         {
             t[parent] = t[k]; //replace
