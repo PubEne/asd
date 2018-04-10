@@ -22,7 +22,12 @@ void insertion_sort(T t[],const size_t& n)
 template<typename T>
 void insertion_sort_with_sentinel(T t[],const size_t& n)
 {
-
+    for(size_t i = n-1; i; --i) //set smallest on the beginning of the array(pseudo-sentinel)
+        if(t[i] < t[i-1])
+            std::swap(t[i],t[i-1]);
+    for(size_t i = 2; i < n; ++i)
+        for(size_t j = i; t[j-1] > t[j]; --j)
+            std::swap(t[j],t[j-1]);
 }
 //œœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœ
 
@@ -102,7 +107,7 @@ void counting_sort(T t[],const size_t& n)
 template<typename T>
 void radix_sort(T t[],const size_t& n)
 {
-    T max_el = *std::max_element(t,t+n);
+    T max_el = *std::max_element(t,t+n); //from <algorithm>
     for(size_t exp = 1; exp < max_el; exp*=10)
     {
         T occurrences[10] = {0};
@@ -167,7 +172,7 @@ void heap_sort(T t[],size_t n)
         siftDown(t,n,i); //start with the most right parent
     while(--n) 
     {
-        /* swap the largest with the smallest value, and siftDown the smallest, decrease by 1 size, so we don't change our largest value
+        /* swap the largest with the smallest value, and siftDown the smallest, decrease by 1 size, so we don't change our largest value(freeing heap)
         */
         std::swap(t[0],t[n]); 
         siftDown(t,n,0);
@@ -180,6 +185,7 @@ int main()
     int t[] = {9,8,7,6,5,4,3,2,1};
     printArray(t,9);
     //insertion_sort(t,9); //+
+    insertion_sort_with_sentinel(t,9);
     //quick_sort(t,9); //+
     //merge_sort(t,9); //+
     //counting_sort(t,9); //+
