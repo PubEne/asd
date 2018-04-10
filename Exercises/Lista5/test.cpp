@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
 template<typename T>
 constexpr void printArray(T* a,const size_t& n)
@@ -126,18 +127,32 @@ void radix_sort(T t[],const size_t& n)
 
 //œœœœœœœœœœœœœœœœœœœœ bucket sort œœœœœœœœœœœœœœœœœœœœœœœœœœ
 template<typename T>
-void bucket_sort(T t[],const size_t& n)
+void bucket_sort(T arr[],const size_t& n)
 {
-    T max = *t, min = *t;
-    for(size_t i = 1; i < n; ++i)
-        if(min > t[i])
-            min = t[i];
-        else if(t[i] > max)
-            max = t[i];
-    if(max == min) 
-        return;
-    
-    
+    T bucket[10][n+1];
+    for(size_t i = 0; i < 10; ++i)
+        bucket[i][n] = 0;
+    T max_el = *std::max_element(arr,arr+n); //from <algorithm>
+    //for each digit 
+    for(size_t digit = 1; digit < max_el; digit *= 10)
+    {
+        //array to bucket
+        for(size_t i = 0; i < n; ++i)
+        {
+            size_t num = (arr[i]/digit)%10; //0-9
+            //add to bucket and increment count
+            bucket[num][bucket[num][n]++] = arr[i];
+        }
+        //bucket to array
+        size_t index = 0;
+        for(size_t i = 0; i < 10; ++i)
+        {
+            for(size_t j = 0; j < bucket[i][n]; ++j)
+                arr[index++] = bucket[i][j];
+            //reset internal bucket counters
+            bucket[i][n] = 0;
+        }
+    }
 }
 //œœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœœ
 
@@ -185,11 +200,12 @@ int main()
     int t[] = {9,8,7,6,5,4,3,2,1};
     printArray(t,9);
     //insertion_sort(t,9); //+
-    insertion_sort_with_sentinel(t,9);
+    //insertion_sort_with_sentinel(t,9); //+
     //quick_sort(t,9); //+
     //merge_sort(t,9); //+
     //counting_sort(t,9); //+
     //radix_sort(t,9); //+
     //heap_sort(t,9); //+
+    bucket_sort(t,9); 
     printArray(t,9);
 }
