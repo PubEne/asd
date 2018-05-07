@@ -56,9 +56,9 @@ namespace ASD
                 if(i-1 >= 0 && a[i-1][j])
                     obj.make_union(i*n+j,(i-1)*n+j);
                 if(j-1 >= 0 && a[i][j-1])
-                    obj.make_union(i*n+j,(i*n)+j-1);
+                    obj.make_union(i*n+j,i*n+j-1);
                 if(j+1 < n && a[i][j+1])
-                    obj.make_union(i*n+j,(i*n)+j+1); 
+                    obj.make_union(i*n+j,i*n+j+1); 
             }
         bool temp[n] = {0};
         size_t numberOfIslands = 0;
@@ -79,7 +79,7 @@ int main()
     constexpr size_t n = 5;
     bool t[n][n] = {{1,1,0,0,0},
                     {0,1,0,0,1},
-                    {0,0,0,0,0},
+                    {0,0,1,0,0},
                     {0,0,0,0,0},
                     {1,0,1,0,1}};
     std::cout << ASD::countIslands(n,t) << std::endl;
