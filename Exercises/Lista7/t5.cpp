@@ -5,11 +5,13 @@ namespace ASD
     class UnionFind final
     {
         public:
-            explicit UnionFind(const size_t& n) : m_parent{new size_t[n]},m_rank{new size_t[n]}
+            UnionFind(const size_t& n) : m_parent{new size_t[n]}, m_rank{new size_t[n]}
             {
                 for(size_t i = 0; i < n; ++i)
+                {
                     m_parent[i] = i;
-                m_rank[n] = {0};
+                    m_rank[i] = 0;
+                }
             }
             size_t find(const size_t& i)
             {
@@ -34,8 +36,8 @@ namespace ASD
             }
             ~UnionFind()
             {
-                delete[] m_parent;
                 delete[] m_rank;
+                delete[] m_parent;
             }
         private:
             size_t* m_parent;
@@ -44,4 +46,5 @@ namespace ASD
 }
 int main()
 {
+    ASD::UnionFind obj(25);
 }
