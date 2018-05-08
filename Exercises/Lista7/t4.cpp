@@ -7,6 +7,29 @@
 /* polygon triangulation using dynamic programming */
 namespace ASD
 {
+    template<typename T = size_t>
+    constexpr T binomialCoefficient(T n, T k)
+    {
+        size_t res = 1;
+        if(k > n - k)
+            k = n-k;
+        for(size_t i = 0; i < k; ++i)
+        {
+            res *= (n-i);
+            res /= (i+1);
+        }
+        return res;
+    }
+    template<typename T = size_t>
+    constexpr T catalan(const T& n)
+    {
+        return binomialCoefficient(2*n,n)/(n+1);
+    }
+    template<typename T = size_t>
+    constexpr T f(const T& n)
+    {
+        return catalan(n-2);
+    }
     template<typename T = double>
     constexpr T cost(const std::vector<std::pair<T,T>>& points, const size_t& i, const size_t& j, const size_t& k)
     {
@@ -37,12 +60,10 @@ namespace ASD
                 }
         return arr[0][points.size()-1];
     } 
-    constexpr size_t f(const size_t& n)
-    {
-    }
 }
 int main()
 {
     const std::vector<std::pair<double,double>> v = {{0,0}, {1,0}, {2,1}, {1,2}, {0,2}};
     std::cout << ASD::g(v) << std::endl;
+    std::cout << ASD::f(10) << std::endl;
 }
