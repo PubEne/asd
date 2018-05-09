@@ -83,11 +83,8 @@ namespace ASD
             {
                 for(size_t j = 0; j < n; ++j)
                     if(t[n-1][j])
-                    {
-                        //std::cout << obj.find(i*n+j) << "," << obj.find(i*n+j) << std::endl;
-                        if(obj.find(i) == obj.find(i*n+n-1))
+                        if(obj.find(i) == obj.find((n-1)*n+j))
                             return 1;
-                    }
             }
         return 0;
     }
@@ -108,9 +105,9 @@ int main()
                                {1,1,1,1,1}};
 
     constexpr bool t3[n][n] = {{1,0,0,0,0},
-                               {1,1,0,0,1},
+                               {1,0,0,0,1},
                                {0,1,0,0,0},
                                {0,1,0,1,0},
-                               {1,1,1,0,1}};
+                               {1,1,1,1,1}};
     std::cout << ASD::DoesPathExistB(n,t3) << std::endl;
 }
