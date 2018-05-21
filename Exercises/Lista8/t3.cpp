@@ -2,6 +2,7 @@
 #include <limits>
 #include <algorithm>
 #include <sstream>
+#include <queue>
 #include <fstream>
 #include <vector>
 #include <list>
@@ -24,12 +25,12 @@ namespace ASD
                     parent[i] = find(parent[i]);
                 return parent[i];
             }
-            size_t make_union(const size_t& i,const size_t& j)
+            bool make_union(const size_t& i,const size_t& j)
             {
                 size_t a = find(i);
                 size_t b = find(j);
                 if(a == b)
-                    return 0 ;
+                    return 0;
                 if(rank[a] > rank[b])
                     parent[b] = a;
                 else
@@ -115,7 +116,7 @@ namespace ASD
                             }
                 }
 
-                std::cout << "\t    MST" << std::endl;
+                std::cout << "\t     [MST]" << std::endl;
                 size_t total_min_weight = 0;
                 for(size_t i = 1; i < m_vertices; ++i)
                 {
@@ -125,7 +126,51 @@ namespace ASD
                 std::cout << total_min_weight << std::endl;
                 
             }
-            void printShortestPath();
+            void printShortestPath(const int& start = 0) const
+            {
+                std::priority_queue<std::pair<int,int>,std::vector<std::pair<int,int>>,std::greater<std::pair<int,int>>> pq;     
+                std::vector<int> distances(m_vertices,std::numeric_limits<int>::max());
+                pq.push({0,start});
+                
+                distances[start] = 0;
+                while(!pq.empty())
+                {
+                    int u = pq.top().second;
+                    pq.pop();
+                    for(const auto& v : m_adj[u])
+                    {
+                        int distance = v.second;
+                        int vertex = v.first;
+                        if(distances[vertex] > distances[u] + distance)
+                        {
+                            distances[vertex] = distances[u] + distance;
+                            pq.push({distances[vertex],vertex});
+                        } 
+                    } 
+                     
+                }
+                std::cout << "\t     [Dijkstra algorithm]" << std::endl;
+                for(size_t i = 0; i < m_vertices; ++i)
+                    std::cout << i << "\t" << distances[i] << std::endl;
+            }
+            void printShortestPath2()
+            {
+                std::vector<bool> mst(m_vertices,0);
+                std::vector<int> distances(m_vertices,std::numeric_limits<int>::max());
+                distances[0] = 0;
+                for(size_t i = 0; i < m_vertices; ++i)
+                {
+                    int vertex = getMinimumVertex(mst,distances);
+                    mst[vertex] = 1;
+
+                    for(size_t j = 0; j < m_vertices; ++j)
+                            if(!mst[j] && m_adj[vertex][j].second && distances[vertex] != std::numeric_limits<int>::max() && distances[vertex]+m_adj[vertex][j].second < distances[j])
+                                distances[j] = distances[vertex] + m_adj[vertex][j].second;
+                }
+                std::cout << "\t     [Dijkstra algorithm]" << std::endl;
+                for(size_t i = 0; i < m_vertices; ++i)
+                    std::cout << i << "\t" << distances[i] << std::endl;
+            }
             void addEdge(const size_t& src,const size_t& dest,const double& distance = 1)
             {
                 m_adj[src].push_back({dest,distance});
@@ -190,4 +235,6 @@ int main()
     graph.printAdjacencyList();
     graph.printAdjacencyMatrix();
     graph.printMST();
+    graph.printShortestPath();
+    graph.printShortestPath2();
 }
