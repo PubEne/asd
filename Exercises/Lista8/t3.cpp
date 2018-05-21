@@ -3,22 +3,33 @@
 #include <fstream>
 #include <vector>
 #include <list>
+#include <forward_list>
 #include <string>
 
 namespace ASD
 {
+    class UnionFind final
+    {
+        
+    };
     class Graph final
     {
         private:
             struct Edge;
         public:
-            explicit Graph(const size_t& num = 10) : m_vertices(num),m_adj(num) {}
-            void createGraph(const std::string& filename)
+            explicit Graph(const std::string& filename) : m_vertices(0),m_adj(0)
             {
                 std::ifstream inFile;
                 inFile.open(filename);
                 inFile >> m_vertices >> m_edges;
+
                 m_adj.resize(m_vertices);
+                for(auto& v : m_adj)
+                {
+                    v.resize(m_vertices);
+                    for(auto& el : v)
+                        el = {0,0};
+                }
                 if(inFile.is_open())
                 {
                     Edge edge;
@@ -27,32 +38,44 @@ namespace ASD
                 }
                 inFile.close();
             }
-            void printAdjacencyMatrix()
+            void printAdjacencyMatrix() const
             {
+                std::cout << "\t     [AdjacencyMatrix]" << std::endl;
+                std::cout << "\t";
+                for(size_t i = 0; i < m_adj.size(); ++i)
+                    std::cout << i << "   ";
+                std::cout << std::endl;
+                
                 for(size_t i = 0; i < m_adj.size(); ++i)
                 {
-                    for(const auto& l : m_adj)
-                        if(m_adj[i] == l)
-                        {
-                            const auto& el = l.begin();
-                            std::cout << (*el).second << " ";
-                        }
+                    std::cout << i << " | [ ";
+                    for(size_t j = 0; j < m_adj.size(); ++j)
+                    {
+                        if(i == j)
+                            std::cout << "  =,";
+                        else if(!m_adj[i][j].second)
+                            std::cout << "  0,";
                         else
-                            std::cout << 0 << " ";
-                    std::cout << std::endl;
+                            std::cout << "  " << m_adj[i][j].second << ",";    
+                    }
+                    std::cout << " ]\r\n";
                 }
+                std::cout << "\r\n"; 
             }
-            void printMST();
+            void printMST()
+            {
+                
+            }
             void printShortestPath();
-            void edge2(const size_t& src,const size_t& dest,const double& distance = 1)
+            void addEdge(const size_t& src,const size_t& dest,const double& distance = 1)
             {
                 m_adj[src].push_back({dest,distance});
                 m_adj[dest].push_back({src,distance});
             }
             void addEdge(const Edge& edge)
             {
-                m_adj[edge.m_src].push_back({edge.m_dest,edge.m_distance});
-                m_adj[edge.m_dest].push_back({edge.m_src,edge.m_distance});
+                m_adj[edge.m_src][edge.m_dest] = {edge.m_dest,edge.m_distance};
+                m_adj[edge.m_dest][edge.m_src] = {edge.m_src,edge.m_distance};
             }
             size_t getNumberOfEdges() const
             {
@@ -62,14 +85,16 @@ namespace ASD
             {
                 return m_vertices;
             }
-            void show() const
+            void printAdjacencyList() const
             {
+                std::cout << "\t     [AdjacencyList]" << std::endl;
                 size_t i = 0;
-                for(const auto& l : m_adj)
+                for(const auto& v : m_adj)
                 {
                     std::cout << i++ << "|--";
-                    for(const auto& n : l)
-                        std::cout << n.second << "-->" << n.first << "|--";
+                    for(const auto& el : v)
+                        if(el.second)
+                            std::cout << el.second << "-->" << el.first << "|--";
                     std::cout << std::endl;
                 }
             }
@@ -78,9 +103,9 @@ namespace ASD
             {
                 size_t m_src = 0;
                 size_t m_dest = 0;
-                size_t m_distance = 0;
+                double m_distance = 0;
             };
-            std::vector<std::list<std::pair<size_t,double>>> m_adj;
+            std::vector<std::vector<std::pair<size_t,double>>> m_adj;
             size_t m_vertices;
             size_t m_edges;
     };
@@ -88,9 +113,7 @@ namespace ASD
 
 int main()
 {
-    ASD::Graph graph;
-    graph.createGraph("t3txt.txt");
-    std::cout << graph.getNumberOfVertices() <<  "," << graph.getNumberOfEdges() << std::endl;
-    graph.show();
+    ASD::Graph graph("t3txt.txt");;
+    graph.printAdjacencyList();
     graph.printAdjacencyMatrix();
 }
