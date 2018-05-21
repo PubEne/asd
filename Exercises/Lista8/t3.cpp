@@ -1,4 +1,6 @@
 #include <iostream>
+#include <limits>
+#include <algorithm>
 #include <sstream>
 #include <fstream>
 #include <vector>
@@ -10,13 +12,44 @@ namespace ASD
 {
     class UnionFind final
     {
-        
+        public:
+            UnionFind(const size_t& n) : parent(n), rank(n,0)
+            {
+                for(size_t i = 0; i < n; ++i)
+                    parent[i] = i;
+            }
+            size_t find(const size_t& i)
+            {
+                if(parent[i] != i)
+                    parent[i] = find(parent[i]);
+                return parent[i];
+            }
+            size_t make_union(const size_t& i,const size_t& j)
+            {
+                size_t a = find(i);
+                size_t b = find(j);
+                if(a == b)
+                    return 0 ;
+                if(rank[a] > rank[b])
+                    parent[b] = a;
+                else
+                {
+                    parent[a] = b;
+                    if(rank[a] == rank[b])
+                        ++rank[b];
+                } 
+                return 1;
+            }
+        private:
+            std::vector<int> parent;
+            std::vector<int> rank;
     };
     class Graph final
     {
         private:
             struct Edge;
         public:
+            explicit Graph(const size_t& num) : m_vertices(num), m_adj(num) {}
             explicit Graph(const std::string& filename) : m_vertices(0),m_adj(0)
             {
                 std::ifstream inFile;
@@ -64,6 +97,32 @@ namespace ASD
             }
             void printMST()
             {
+                std::vector<bool> mst(m_vertices,0);
+                std::vector<std::pair<int,int>> resultSet(m_vertices);
+                std::vector<int> key(m_vertices,std::numeric_limits<int>::max());
+                key[0] = 0;
+                resultSet[0].first = -1; 
+                for(size_t i = 0; i < m_vertices; ++i)
+                {
+                    int vertex = getMinimumVertex(mst,key);
+                    mst[vertex] = 1;
+                    for(size_t j = 0; j < m_vertices; ++j)
+                        if(m_adj[vertex][j].second > 0)
+                            if(!mst[j] && m_adj[vertex][j].second < key[j])
+                            {
+                                key[j] = m_adj[vertex][j].second;
+                                resultSet[j] = {vertex,key[j]};
+                            }
+                }
+
+                std::cout << "\t    MST" << std::endl;
+                size_t total_min_weight = 0;
+                for(size_t i = 1; i < m_vertices; ++i)
+                {
+                    std::cout << "Edge: " << i << " - " << resultSet[i].first << " distance: " << resultSet[i].second << std::endl;
+                    total_min_weight += resultSet[i].second;
+                }
+                std::cout << total_min_weight << std::endl;
                 
             }
             void printShortestPath();
@@ -101,10 +160,24 @@ namespace ASD
         private:
             struct Edge final
             {
+                Edge(){}
+                Edge(const size_t& src,const size_t& dest,const double& distance) : m_src(src), m_dest(dest), m_distance(distance) {}
                 size_t m_src = 0;
                 size_t m_dest = 0;
                 double m_distance = 0;
             };
+            int getMinimumVertex(const std::vector<bool>& mst,const std::vector<int>& key)
+            {
+                int min_key = std::numeric_limits<int>::max();
+                int vertex = -1;
+                for(size_t i = 0; i < m_vertices; ++i)
+                    if(!mst[i] && min_key > key[i])
+                    {
+                        min_key = key[i];
+                        vertex = i;
+                    }
+                return vertex;
+            }
             std::vector<std::vector<std::pair<size_t,double>>> m_adj;
             size_t m_vertices;
             size_t m_edges;
@@ -116,4 +189,5 @@ int main()
     ASD::Graph graph("t3txt.txt");;
     graph.printAdjacencyList();
     graph.printAdjacencyMatrix();
+    graph.printMST();
 }
