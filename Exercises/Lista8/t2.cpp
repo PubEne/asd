@@ -33,8 +33,8 @@ namespace ASD
         constexpr double inf = std::numeric_limits<double>::max();
         std::vector<std::pair<double,double>> crd = FillAndSortVector(numberOfCities);
 
-        std::vector<std::vector<double>> bitonicDistances(numberOfCities,std::vector<double>(numberOfCities,0));
-        std::vector<std::vector<int>> result(numberOfCities,std::vector<int>(numberOfCities,-1));
+        std::vector<std::vector<double>> bitonicDistances(numberOfCities+1,std::vector<double>(numberOfCities+1,0));
+        std::vector<std::vector<int>> result(numberOfCities+1,std::vector<int>(numberOfCities+1,-1));
 
         auto euclideanDistance = [](const auto& a,const auto b) -> double { return sqrt(pow(a.first - b.first,2)+pow(a.second - b.second,2)); };
 
@@ -56,8 +56,8 @@ namespace ASD
                             no = k;
                         }
                     }    
-                bitonicDistances[i][j] = min_dis;
-                result[i][j] = no;
+                    bitonicDistances[i][j] = min_dis;
+                    result[i][j] = no;
                 } 
             }
         double cost = bitonicDistances[numberOfCities-1][numberOfCities] + euclideanDistance(crd[numberOfCities-2], crd[numberOfCities-1]);
