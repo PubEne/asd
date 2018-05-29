@@ -49,18 +49,19 @@ namespace ASD
     {
         private:
             struct Edge;
+            class min_priority_queue;
         public:
-            explicit Graph(const size_t& num) : m_vertices(num), m_adj(num) {}
+            explicit Graph(const size_t& num) : m_vertices(num), m_adj(num,std::vector<std::pair<size_t,double>>(num,{0,0})) {}
             explicit Graph(const std::string& filename) : m_vertices(0),m_adj(0)
             {
                 std::ifstream inFile;
                 inFile.open(filename);
                 inFile >> m_vertices >> m_edges;
 
-                m_adj.resize(m_vertices);
+                m_adj.resize(m_vertices+1);
                 for(auto& v : m_adj)
                 {
-                    v.resize(m_vertices);
+                    v.resize(m_vertices+1);
                     for(auto& el : v)
                         el = {0,0};
                 }
@@ -76,14 +77,14 @@ namespace ASD
             {
                 std::cout << "\t     [AdjacencyMatrix]" << std::endl;
                 std::cout << "\t";
-                for(size_t i = 0; i < m_adj.size(); ++i)
+                for(size_t i = 1; i < m_adj.size(); ++i)
                     std::cout << i << "   ";
                 std::cout << std::endl;
                 
-                for(size_t i = 0; i < m_adj.size(); ++i)
+                for(size_t i = 1; i < m_adj.size(); ++i)
                 {
                     std::cout << i << " | [ ";
-                    for(size_t j = 0; j < m_adj.size(); ++j)
+                    for(size_t j = 1; j < m_adj.size(); ++j)
                     {
                         if(i == j)
                             std::cout << "  =,";
@@ -96,18 +97,46 @@ namespace ASD
                 }
                 std::cout << "\r\n"; 
             }
-            void printMST()
+            void printMST(const int& i)
             {
-                std::vector<bool> mst(m_vertices,0);
-                std::vector<std::pair<int,int>> resultSet(m_vertices);
-                std::vector<int> key(m_vertices,std::numeric_limits<int>::max());
+                if(i > m_adj.size()-1)
+                    return;
+                std::vector<int> prev(m_adj.size(),0);
+                std::vector<double> distance(m_adj.size(),std::numeric_limits<double>::max());
+                
+                prev[i] = i;
+                min_priority_queue pq(distance);
+
+                pq.decrease_key(i,0);
+                while(!pq.empty())
+                {
+                    unsigned j = pq.get_min();
+                    for(const auto& node : m_adj[j])
+                        if(distance[node.first] > node.second)
+                        {
+                            prev[node.first] = j;
+                            distance[node.first] = node.second;
+                            pq.decrease_key(node.first,node.second);
+                        }
+                }
+                std::cout << "\t     [MST Tree2]" << std::endl;
+                std::cout << "Edge\t Weight" << std::endl;
+                for(size_t i = 2; i < prev.size(); ++i)
+                    std::cout << prev[i] << "-" << i << "\t" << distance[i] << std::endl;
+            }
+      /*      void printMST()
+            {
+                std::vector<bool> mst(m_vertices+1,0);
+                std::vector<std::pair<int,int>> resultSet(m_vertices+1);
+                std::vector<int> key(m_vertices+1,std::numeric_limits<int>::max());
                 key[0] = 0;
                 resultSet[0].first = -1; 
-                for(size_t i = 0; i < m_vertices; ++i)
+                for(size_t i = 0; i < m_vertices+1; ++i)
                 {
                     int vertex = getMinimumVertex(mst,key);
                     mst[vertex] = 1;
-                    for(size_t j = 0; j < m_vertices; ++j)
+            
+                    for(size_t j = 0; j < m_vertices+1; ++j)
                         if(m_adj[vertex][j].second > 0)
                             if(!mst[j] && m_adj[vertex][j].second < key[j])
                             {
@@ -117,19 +146,63 @@ namespace ASD
                 }
 
                 std::cout << "\t     [MST]" << std::endl;
-                size_t total_min_weight = 0;
-                for(size_t i = 1; i < m_vertices; ++i)
-                {
+                for(size_t i = 1; i < m_vertices+1; ++i)
                     std::cout << "Edge: " << i << " - " << resultSet[i].first << " distance: " << resultSet[i].second << std::endl;
-                    total_min_weight += resultSet[i].second;
-                }
-                std::cout << total_min_weight << std::endl;
                 
+            }*/
+            void printMSTKruskal()
+            {
+                Graph tree(m_adj.size()); 
+                UnionFind uf(m_adj.size()); 
+                std::vector<Edge> edges; 
+
+                for(size_t i = 0; i < m_adj.size(); ++i)
+                    for(const auto& el : m_adj[i])
+                        if(el.first)
+                            edges.emplace_back(Edge(i,el.first,el.second));
+                std::sort(edges.begin(),edges.end(),[](const Edge& e1,const Edge& e2) { return e1.m_distance < e2.m_distance; });
+                for(const auto& edge : edges)
+                    if(uf.make_union(edge.m_src,edge.m_dest))
+                        tree.addEdge(edge.m_src,edge.m_dest,edge.m_distance);
+                tree.printAdjacencyList(0);
             }
-            void printShortestPath(const int& start = 0) const
+            void printMSTPrim(const int& start = 1) const
             {
                 std::priority_queue<std::pair<int,int>,std::vector<std::pair<int,int>>,std::greater<std::pair<int,int>>> pq;     
-                std::vector<int> distances(m_vertices,std::numeric_limits<int>::max());
+                std::vector<double> distances(m_vertices+1,std::numeric_limits<double>::max());
+                std::vector<int> parent(m_vertices+1,-1);
+                std::vector<bool> inMST(m_vertices+1,false);
+                pq.push({0,start});
+                
+                distances[start] = 0;
+                while(!pq.empty())
+                {
+                    int u = pq.top().second;
+                    std::cout << pq.top().first << std::endl;
+                    pq.pop();
+                    inMST[u] = 1;
+                    for(const auto& v : m_adj[u])
+                    {
+                        double distance = v.second;
+                        int vertex = v.first;
+                        if(!inMST[vertex] && distances[vertex] > distance)
+                        {
+                            distances[vertex] = distance;
+                            pq.push({distances[vertex],vertex});
+                            parent[vertex] = u;
+                        } 
+                    } 
+                     
+                }
+                std::cout << "\t     [MST Prim v.2]" << std::endl;
+                for(size_t i = 2; i < m_vertices+1; ++i)
+                    std::cout << parent[i] << "-"  << i << "\t" << distances[i] << std::endl;
+            }
+            void printShortestPath(const int& start = 1) const
+            {
+                std::priority_queue<std::pair<int,int>,std::vector<std::pair<int,int>>,std::greater<std::pair<int,int>>> pq;     
+                std::vector<double> distances(m_vertices+1,std::numeric_limits<double>::max());
+                std::vector<double> weight;
                 pq.push({0,start});
                 
                 distances[start] = 0;
@@ -139,8 +212,10 @@ namespace ASD
                     pq.pop();
                     for(const auto& v : m_adj[u])
                     {
-                        int distance = v.second;
+                        double distance = v.second;
                         int vertex = v.first;
+                        if(distance)
+                            weight.emplace_back(distance);
                         if(distances[vertex] > distances[u] + distance)
                         {
                             distances[vertex] = distances[u] + distance;
@@ -150,15 +225,48 @@ namespace ASD
                      
                 }
                 std::cout << "\t     [Dijkstra algorithm]" << std::endl;
-                for(size_t i = 0; i < m_vertices; ++i)
-                    std::cout << i << "\t" << distances[i] << std::endl;
+                for(size_t i = 2; i < m_vertices+1; ++i)
+                    std::cout << i << "(" << weight[i] << ")" << "\t" << distances[i] << std::endl;
             }
-            void printShortestPath2()
+            void DFSTraversal(size_t start = 1) const
             {
-                std::vector<bool> mst(m_vertices,0);
-                std::vector<int> distances(m_vertices,std::numeric_limits<int>::max());
-                distances[0] = 0;
-                for(size_t i = 0; i < m_vertices; ++i)
+                static std::vector<bool> visited(m_vertices+1,false);
+                if(!visited[start])
+                {
+                    visited[start] = 1;
+                    std::cout << " " << start;
+                    for(const auto& el : m_adj[start])
+                        if(el.first)
+                            if(!visited[el.first])
+                                DFSTraversal(el.first);
+                }
+            }
+            
+            void BFSTraversal(size_t start = 1) const
+            {
+                std::vector<bool> visited(m_vertices+1,false);
+                std::queue<unsigned> q;
+                std::cout << std::endl;
+
+                visited[start] = 1;
+                q.emplace(start);
+                while(!q.empty())
+                {
+                    start = q.front();
+                    std::cout << start << " ";
+                    q.pop();
+                    for(const auto& el : m_adj[start])
+                        if(el.first)
+                            if(!visited[el.first] && (visited[el.first] = 1))
+                                q.emplace(el.first);
+                }
+            }
+            void printShortestPath2() const
+            {
+                std::vector<bool> mst(m_vertices+1,0);
+                std::vector<int> distances(m_vertices+1,std::numeric_limits<int>::max());
+                distances[1] = 0;
+                for(size_t i = 1; i < m_vertices+1; ++i)
                 {
                     int vertex = getMinimumVertex(mst,distances);
                     mst[vertex] = 1;
@@ -167,8 +275,8 @@ namespace ASD
                             if(!mst[j] && m_adj[vertex][j].second && distances[vertex] != std::numeric_limits<int>::max() && distances[vertex]+m_adj[vertex][j].second < distances[j])
                                 distances[j] = distances[vertex] + m_adj[vertex][j].second;
                 }
-                std::cout << "\t     [Dijkstra algorithm]" << std::endl;
-                for(size_t i = 0; i < m_vertices; ++i)
+                std::cout << "\t     [Dijkstra's algorithm]" << std::endl;
+                for(size_t i = 1; i < m_vertices+1; ++i)
                     std::cout << i << "\t" << distances[i] << std::endl;
             }
             void addEdge(const size_t& src,const size_t& dest,const double& distance = 1)
@@ -189,13 +297,18 @@ namespace ASD
             {
                 return m_vertices;
             }
-            void printAdjacencyList() const
+            void printAdjacencyList(const bool& print = 1) const
             {
-                std::cout << "\t     [AdjacencyList]" << std::endl;
-                size_t i = 0;
+                if(print)
+                    std::cout << "\t     [AdjacencyList]" << std::endl;
+                else
+                    std::cout << "\t     [MST Tree]" << std::endl;
+                size_t i = 0,j = 0;
                 for(const auto& v : m_adj)
                 {
-                    std::cout << i++ << "|--";
+                    if(!j++)
+                       continue;
+                    std::cout << ++i << "|--";
                     for(const auto& el : v)
                         if(el.second)
                             std::cout << el.second << "-->" << el.first << "|--";
@@ -211,11 +324,60 @@ namespace ASD
                 size_t m_dest = 0;
                 double m_distance = 0;
             };
-            int getMinimumVertex(const std::vector<bool>& mst,const std::vector<int>& key)
+            class min_priority_queue final
+            {
+                public:
+                    min_priority_queue(const std::vector<double>& distances) : distance(distances), what(distances.size()), where(distances.size()) 
+                    {
+                        for(size_t i = 0; i < distance.size(); ++i)
+                            what[i] = where[i] = i;
+                    }
+                    void decrease_key(const unsigned& i,const double& val)
+                    {
+                        distance[i] = val;
+                        siftUp(where[i]);
+                    }
+                    size_t size() const
+                    {
+                        return what.size();
+                    }
+                    unsigned get_min()
+                    {
+                        unsigned result = what[0], i = 0, k = 2*i+2, n = what.size()-1;
+                        what[0] = what[n];
+                        what.pop_back();
+                        while(k < n && distance[what[i]] > distance[what[k]] && distance[what[k-1]] > distance[what[k]] || --k < n && distance[what[i]] > distance[what[k]])
+                        {
+                            std::swap(what[i],what[k]);
+                            where[what[i]] = i;
+                            where[what[k]] = k;
+                        }
+                        return result;
+                    } 
+                    bool empty() const
+                    {
+                        return what.empty();
+                    }
+                private:
+                    void siftUp(const unsigned& n)
+                    {
+                        unsigned i;
+                        while(n > 0 && distance[what[i=(n-1)/2]] > distance[what[n]])
+                        {
+                            std::swap(what[i],what[n]);
+                            where[what[i]] = i;
+                            where[what[n]] = n;
+                        }
+                    }
+                    std::vector<double> distance;
+                    std::vector<int> what;
+                    std::vector<int> where;
+            };
+            int getMinimumVertex(const std::vector<bool>& mst,const std::vector<int>& key) const
             {
                 int min_key = std::numeric_limits<int>::max();
                 int vertex = -1;
-                for(size_t i = 0; i < m_vertices; ++i)
+                for(size_t i = 0; i < m_vertices+1; ++i)
                     if(!mst[i] && min_key > key[i])
                     {
                         min_key = key[i];
@@ -234,7 +396,10 @@ int main()
     ASD::Graph graph("t3txt.txt");;
     graph.printAdjacencyList();
     graph.printAdjacencyMatrix();
-    graph.printMST();
+    graph.printMSTKruskal();
+    graph.printMST(1);
+    graph.printMSTPrim();
     graph.printShortestPath();
-    graph.printShortestPath2();
+    std::cout << std::endl;
+    //graph.printShortestPath2();
 }
